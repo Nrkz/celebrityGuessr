@@ -1,36 +1,36 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Devine la star</title>
+<title>Devine le champion — League of Legends</title>
 <style>
-  :root{--bg:#0f1220;--card:#1a1f36;--ink:#f3f4fb;--mute:#9aa0c0;--acc:#ffcb3d;--ok:#3ddc97;--bad:#ff5d73;--line:#2b3156}
+  :root{--bg:#0a1428;--card:#0f1d38;--ink:#f0e6d2;--mute:#a09b8c;--acc:#c8aa6e;--ok:#0ac8b9;--bad:#e84057;--line:#1e2d4d}
   *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#262c52,var(--bg) 60%);color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;display:flex;justify-content:center;padding:16px}
-  main{width:100%;max-width:560px}
-  h1{text-align:center;margin:8px 0 4px;font-size:1.9rem}
+  body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#1b2f58,var(--bg) 60%);color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;display:flex;justify-content:center;padding:16px}
+  main{width:100%;max-width:720px}
+  h1{text-align:center;margin:8px 0 4px;font-size:1.8rem;color:var(--acc)}
   .sub{text-align:center;color:var(--mute);margin:0 0 16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
-  .hud{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px;font-weight:600}
-  .pill{background:#0f1220;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.9rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .hud{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px;font-weight:600;flex-wrap:wrap}
+  .pill{background:#060e1e;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.9rem}
   .pill b{color:var(--acc)}
-  .stage{position:relative;aspect-ratio:1/1;background:#0b0e1b;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-  .stage img{width:100%;height:100%;object-fit:contain;transition:filter .45s linear}
+  .stage{position:relative;aspect-ratio:1215/717;background:#060e1e;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .stage img{width:100%;height:100%;object-fit:cover;transition:filter .45s linear}
   .stage .loading{position:absolute;color:var(--mute)}
-  .bar{height:8px;background:#0f1220;border-radius:99px;margin:12px 0;overflow:hidden}
+  .bar{height:8px;background:#060e1e;border-radius:99px;margin:12px 0;overflow:hidden}
   .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--acc),var(--ok));transition:width .45s linear}
   .pts{text-align:center;color:var(--mute);margin:0 0 10px;font-size:.95rem}
-  .pts b{color:var(--acc);font-size:1.1rem}
+  .pts b{color:var(--acc);font-size:1.05rem}
   form{display:flex;gap:8px}
-  input[type=text]{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#0f1220;color:var(--ink);font-size:1rem}
-  button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-size:1rem;font-weight:700;background:var(--acc);color:#1b1500}
+  input[type=text]{flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#060e1e;color:var(--ink);font-size:1rem}
+  button{cursor:pointer;border:0;border-radius:10px;padding:12px 16px;font-size:1rem;font-weight:700;background:var(--acc);color:#1a1405}
   button.ghost{background:transparent;color:var(--mute);border:1px solid var(--line)}
   button:disabled{opacity:.5;cursor:default}
   .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .choices button{background:#0f1220;color:var(--ink);border:1px solid var(--line);padding:14px 10px}
+  .choices button{background:#060e1e;color:var(--ink);border:1px solid var(--line);padding:14px 10px}
   .choices button:hover:not(:disabled){border-color:var(--acc)}
-  .choices .good{background:var(--ok);color:#06251a;border-color:var(--ok)}
+  .choices .good{background:var(--ok);color:#03241f;border-color:var(--ok)}
   .choices .wrong{background:var(--bad);color:#2a0710;border-color:var(--bad)}
   .msg{min-height:1.6em;text-align:center;font-weight:700;margin:10px 0 0}
   .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
@@ -41,23 +41,22 @@
   .hide{display:none!important}
   ul.rec{list-style:none;padding:0;margin:12px 0;text-align:left}
   ul.rec li{padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
-  small.src{display:block;text-align:center;color:var(--mute);margin-top:14px}
+  small.src{display:block;text-align:center;color:var(--mute);margin-top:14px;font-size:.75rem}
 </style>
 </head>
 <body>
 <main>
-  <h1>🎭 Devine la star</h1>
-  <p class="sub">L'image se dévoile peu à peu. Reconnais-la vite pour gagner plus de points !</p>
+  <h1>⚔️ Devine le champion</h1>
+  <p class="sub">L'illustration se dévoile peu à peu. Reconnais-la vite pour gagner plus de points !</p>
 
-  <!-- Accueil -->
   <section id="home" class="card center">
-    <p>10 manches · célébrités et personnages</p>
-    <p class="pts">Plus tu devines tôt, plus tu gagnes.<br>Les bonnes réponses d'affilée multiplient tes points (jusqu'à ×3).</p>
+    <p id="homeMsg">Chargement des champions…</p>
+    <p class="pts">10 manches · illustrations des champions de League of Legends (skin de base).<br>
+      Plus tu devines tôt, plus tu gagnes. Les bonnes réponses d'affilée multiplient tes points (jusqu'à ×3).</p>
     <p class="pts">Meilleur score : <b id="best">0</b></p>
-    <button id="start">Jouer</button>
+    <button id="start" disabled>Jouer</button>
   </section>
 
-  <!-- Jeu -->
   <section id="game" class="card hide">
     <div class="hud">
       <span class="pill">Manche <b id="round">1</b>/10</span>
@@ -66,13 +65,13 @@
     </div>
     <div class="stage">
       <span class="loading" id="loading">Chargement…</span>
-      <img id="pic" alt="Image à deviner" referrerpolicy="no-referrer">
+      <img id="pic" alt="Illustration à deviner" referrerpolicy="no-referrer">
     </div>
     <div class="bar"><i id="bar"></i></div>
-    <p class="pts">Catégorie : <b id="cat"></b> · Réponse libre : <b id="pts">0</b> pts</p>
+    <p class="pts">Rôle : <b id="cat"></b> · Réponse libre : <b id="pts">0</b> pts</p>
 
     <form id="form" autocomplete="off">
-      <input type="text" id="answer" placeholder="Qui est-ce ?" autofocus>
+      <input type="text" id="answer" placeholder="Quel champion ?">
       <button type="submit">OK</button>
     </form>
     <div id="choices" class="choices hide"></div>
@@ -83,7 +82,6 @@
     </div>
   </section>
 
-  <!-- Fin -->
   <section id="end" class="card center hide">
     <p>Partie terminée</p>
     <div class="big" id="final">0</div>
@@ -92,84 +90,67 @@
     <button id="again">Rejouer</button>
   </section>
 
-  <small class="src">Images : Wikipédia / Wikimedia Commons</small>
+  <small class="src">Illustrations et données : Riot Games (Data Dragon). Projet de fan, non affilié à Riot Games.<br>League of Legends et Riot Games sont des marques de Riot Games, Inc.</small>
 </main>
 
 <script>
-// Titre Wikipédia (anglais) pour récupérer l'image, nom affiché, catégorie.
-const POOL = [
-  ["Albert Einstein","Albert Einstein","Célébrité"],["Marilyn Monroe","Marilyn Monroe","Célébrité"],
-  ["Michael Jackson","Michael Jackson","Célébrité"],["Barack Obama","Barack Obama","Célébrité"],
-  ["Elon Musk","Elon Musk","Célébrité"],["Cristiano Ronaldo","Cristiano Ronaldo","Célébrité"],
-  ["Lionel Messi","Lionel Messi","Célébrité"],["Kylian Mbappé","Kylian Mbappé","Célébrité"],
-  ["Zinédine Zidane","Zinedine Zidane","Célébrité"],["Omar Sy","Omar Sy","Célébrité"],
-  ["Jean Dujardin","Jean Dujardin","Célébrité"],["Marion Cotillard","Marion Cotillard","Célébrité"],
-  ["Johnny Hallyday","Johnny Hallyday","Célébrité"],["Édith Piaf","Édith Piaf","Célébrité"],
-  ["Louis de Funès","Louis de Funès","Célébrité"],["Napoléon","Napoleon","Célébrité"],
-  ["Leonardo DiCaprio","Leonardo DiCaprio","Célébrité"],["Brad Pitt","Brad Pitt","Célébrité"],
-  ["Tom Cruise","Tom Cruise","Célébrité"],["Beyoncé","Beyoncé","Célébrité"],
-  ["Rihanna","Rihanna","Célébrité"],["Taylor Swift","Taylor Swift","Célébrité"],
-  ["Keanu Reeves","Keanu Reeves","Célébrité"],["Scarlett Johansson","Scarlett Johansson","Célébrité"],
-  ["Arnold Schwarzenegger","Arnold Schwarzenegger","Célébrité"],["Charlie Chaplin","Charlie Chaplin","Célébrité"],
-  ["Muhammad Ali","Muhammad Ali","Célébrité"],["Freddie Mercury","Freddie Mercury","Célébrité"],
-  ["Mickey Mouse","Mickey Mouse","Personnage"],["Pikachu","Pikachu","Personnage"],
-  ["Mario","Mario","Personnage"],["Sonic","Sonic the Hedgehog","Personnage"],
-  ["Dark Vador","Darth Vader","Personnage"],["Yoda","Yoda","Personnage"],
-  ["Homer Simpson","Homer Simpson","Personnage"],["Bugs Bunny","Bugs Bunny","Personnage"],
-  ["Spider-Man","Spider-Man","Personnage"],["Batman","Batman","Personnage"],
-  ["Superman","Superman","Personnage"],["Harry Potter","Harry Potter (character)","Personnage"],
-  ["Son Goku","Goku","Personnage"],["Astérix","Asterix (character)","Personnage"],
-  ["Tintin","Tintin (character)","Personnage"],["Shrek","Shrek (character)","Personnage"],
-  ["Link","Link (The Legend of Zelda)","Personnage"],["Lara Croft","Lara Croft","Personnage"]
-].map(([name,title,cat])=>({name,title,cat}));
+const DD = "https://ddragon.leagueoflegends.com";
+const ROLES = {Fighter:"Combattant",Tank:"Tank",Mage:"Mage",Assassin:"Assassin",Marksman:"Tireur",Support:"Support"};
+const ROUNDS = 10, MAX_BLUR = 40, STEP_MS = 450, STEPS = 40;     // ~18 s pour tout dévoiler
+let CHAMPS = [], VERSION = "";
 
-const ROUNDS = 10, MAX_BLUR = 40, STEP_MS = 450, STEPS = 40;      // ~18 s pour tout dévoiler
 const $ = id => document.getElementById(id);
 const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const compact = s => norm(s).replace(/ /g,"");
 const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; };
-
 function lev(a,b){const m=[...Array(a.length+1)].map((_,i)=>[i]);for(let j=1;j<=b.length;j++)m[0][j]=j;
   for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return m[a.length][b.length];}
-function isMatch(input, name){
-  const x=norm(input), n=norm(name); if(!x) return false;
+
+// Accepte : nom FR ou EN, sans accents/apostrophes/espaces ("kaisa", "kai sa"), petite faute de frappe,
+// ou le premier mot du nom ("nunu", "renata").
+function matchOne(input, name){
+  const x=compact(input), n=compact(name); if(!x) return false;
   if(x===n) return true;
-  if(n.length>=6 && lev(x,n)<=Math.floor(n.length/6)) return true;           // petite faute de frappe
-  const words=n.split(" ");
-  const last=words[words.length-1];
-  if(words.length>1 && last.length>=4 && (x===last || lev(x,last)<=(last.length>=7?1:0))) return true; // "Obama", "Messi"
-  if(words.length>1 && x===words[0] && words[0].length>=5) return true;       // "Napoléon", "Cristiano"
+  if(n.length>=6 && lev(x,n)<=Math.floor(n.length/6)) return true;
+  const w=norm(name).split(" ");
+  if(w.length>1 && w[0].length>=4 && x===w[0]) return true;
   return false;
 }
+const isMatch = (input, champ) => matchOne(input, champ.name) || matchOne(input, champ.en) || matchOne(input, champ.id);
 
 let st;
-const best = () => { try{return +localStorage.getItem("dls-best")||0}catch{return 0} };
-const saveBest = v => { try{localStorage.setItem("dls-best",v)}catch{} };
+const best = () => { try{return +localStorage.getItem("lol-best")||0}catch{return 0} };
+const saveBest = v => { try{localStorage.setItem("lol-best",v)}catch{} };
 $("best").textContent = best();
 
-const imgCache = {};
-async function getImage(item){
-  if(imgCache[item.title]!==undefined) return imgCache[item.title];
+async function init(){
   try{
-    const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(item.title.replace(/ /g,"_")));
-    if(!r.ok) throw 0;
-    const d = await r.json();
-    let u = d.thumbnail && d.thumbnail.source;
-    if(u) u = u.replace(/\/\d+px-/,"/500px-");   // version un peu plus grande si possible
-    imgCache[item.title]=u||null;
-  }catch{ imgCache[item.title]=null; }
-  return imgCache[item.title];
+    VERSION = (await (await fetch(DD+"/api/versions.json")).json())[0];
+    const [fr,en] = await Promise.all([
+      fetch(`${DD}/cdn/${VERSION}/data/fr_FR/champion.json`).then(r=>r.json()),
+      fetch(`${DD}/cdn/${VERSION}/data/en_US/champion.json`).then(r=>r.json())
+    ]);
+    CHAMPS = Object.values(fr.data).map(c=>({id:c.id, name:c.name, en:en.data[c.id]?.name||c.name, role:c.tags[0]}));
+    $("homeMsg").textContent = `${CHAMPS.length} champions chargés (patch ${VERSION})`;
+    $("start").disabled = false;
+  }catch{
+    $("homeMsg").textContent = "Impossible de charger les champions. Vérifie ta connexion puis recharge la page.";
+  }
 }
+
+// Skin de base uniquement (numéro 0), illustration sans texte ni logo.
+const splash = champ => `${DD}/cdn/img/champion/splash/${champ.id}_0.jpg`;
 function loadImg(url){ return new Promise(res=>{const i=new Image();i.onload=()=>res(true);i.onerror=()=>res(false);i.referrerPolicy="no-referrer";i.src=url;}); }
 
 function newGame(){
-  st = {queue:shuffle(POOL), idx:0, round:0, score:0, streak:0, results:[], timer:null, step:0, phase:"idle"};
+  st = {queue:shuffle(CHAMPS), idx:0, round:0, score:0, streak:0, results:[], timer:null, step:0, phase:"idle"};
   show("game"); updateHud(); nextRound();
 }
 function show(id){ for(const s of ["home","game","end"]) $(s).classList.toggle("hide", s!==id); }
 const mult = () => Math.min(3, 1 + st.streak*0.25);
 function updateHud(){ $("round").textContent=Math.min(st.round,ROUNDS); $("streak").textContent=st.streak; $("mult").textContent=mult().toFixed(2).replace(/\.?0+$/,""); $("score").textContent=st.score; }
-const clarity = () => 1 - st.step/STEPS;                       // 1 = très flou, 0 = net
-const freePts = () => Math.round(20 + 80*clarity());           // 100 → 20
+const clarity = () => 1 - st.step/STEPS;
+const freePts = () => Math.round(20 + 80*clarity());
 const choicePts = () => 10;
 
 async function nextRound(){
@@ -184,13 +165,13 @@ async function nextRound(){
 
   let item, url;
   while(st.idx<st.queue.length){
-    item = st.queue[st.idx++]; url = await getImage(item);
-    if(url && await loadImg(url)) break; url=null;
+    item = st.queue[st.idx++]; url = splash(item);
+    if(await loadImg(url)) break; url=null;
   }
-  if(!url){ $("loading").textContent="Plus d'images disponibles (connexion ?)."; return finish(); }
+  if(!url){ $("loading").textContent="Images indisponibles (connexion ?)."; return finish(); }
   st.cur = item; st.step = 0; st.phase="blur";
   const pic=$("pic"); pic.style.transition="none"; pic.style.filter=`blur(${MAX_BLUR}px)`; pic.src=url; pic.style.visibility="visible";
-  $("loading").classList.add("hide"); $("cat").textContent=item.cat;
+  $("loading").classList.add("hide"); $("cat").textContent=ROLES[item.role]||item.role;
   requestAnimationFrame(()=>{ pic.style.transition=""; });
   tick(); $("answer").focus();
   st.timer=setInterval(()=>{ st.step++; if(st.step>=STEPS){ clearInterval(st.timer); sharp(); } tick(); }, STEP_MS);
@@ -201,16 +182,18 @@ function tick(){
   $("bar").style.width=(c*100)+"%";
   $("pts").textContent = st.phase==="blur" ? Math.round(freePts()*mult()) : Math.round(choicePts()*mult());
 }
-function sharp(){            // image nette : propose 4 noms
+function sharp(){
   st.phase="choice"; st.step=STEPS; tick();
   $("form").classList.add("hide");
-  const others = shuffle(POOL.filter(p=>p.name!==st.cur.name && p.cat===st.cur.cat)).slice(0,3);
+  const same = shuffle(CHAMPS.filter(c=>c.id!==st.cur.id && c.role===st.cur.role));
+  const rest = shuffle(CHAMPS.filter(c=>c.id!==st.cur.id && c.role!==st.cur.role));
+  const others = [...same,...rest].slice(0,3);
   const opts = shuffle([st.cur,...others]);
   const box=$("choices"); box.innerHTML=""; box.classList.remove("hide");
   opts.forEach(o=>{ const b=document.createElement("button"); b.textContent=o.name; b.onclick=()=>pickChoice(b,o); box.appendChild(b); });
-  $("msg").textContent="Image nette ! Choisis le bon nom (points réduits)."; $("msg").className="msg";
+  $("msg").textContent="Image nette ! Choisis le bon champion (points réduits)."; $("msg").className="msg";
 }
-function endRound(ok, pts, how){
+function endRound(ok, pts){
   st.phase="done"; clearInterval(st.timer);
   $("pic").style.filter="blur(0)"; $("bar").style.width="0%";
   $("form").classList.add("hide"); $("skip").classList.add("hide"); $("next").classList.remove("hide");
@@ -223,14 +206,13 @@ function endRound(ok, pts, how){
 }
 function pickChoice(btn,o){
   if(st.phase!=="choice") return;
-  const ok = o.name===st.cur.name;
+  const ok = o.id===st.cur.id;
   if(!ok) btn.classList.add("wrong");
   endRound(ok, Math.round(choicePts()*mult()));
 }
 $("form").addEventListener("submit",e=>{
   e.preventDefault(); if(st.phase!=="blur") return;
-  const v=$("answer").value;
-  if(isMatch(v, st.cur.name)) endRound(true, Math.round(freePts()*mult()));
+  if(isMatch($("answer").value, st.cur)) endRound(true, Math.round(freePts()*mult()));
   else { $("msg").textContent="Non, continue de chercher…"; $("msg").className="msg bad"; $("answer").select(); }
 });
 $("skip").onclick=()=>{ if(st.phase==="blur"){ clearInterval(st.timer); sharp(); } else if(st.phase==="choice"){ endRound(false,0); } };
@@ -244,6 +226,7 @@ function finish(){
   $("recap").innerHTML = st.results.map(r=>`<li><span>${r.ok?"✅":"❌"} ${r.name}</span><b>${r.pts?"+"+r.pts:"0"}</b></li>`).join("");
 }
 $("start").onclick=newGame; $("again").onclick=newGame;
+init();
 </script>
 </body>
 </html>
