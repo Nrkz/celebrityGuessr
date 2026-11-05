@@ -6,7 +6,7 @@ const SB_URL = "https://qqmqiaspmxijjnmkarew.supabase.co/rest/v1/scores";
 const SB_KEY = "sb_publishable_PB596PGqbPs7aROwWmoP8g_3B_lFqKE";   // clé publique, faite pour être visible
 const DD = "https://ddragon.leagueoflegends.com";
 const ROUNDS = 10, STEP_MS = 450, STEPS = 40;                       // ~18 s pour tout dévoiler
-const MAX_BLUR = { lol: 14, pokemon: 10, nintendo: 8, brawl: 5 };   // par type d'image (les petites images supportent moins de flou)
+const MAX_BLUR = { lol: 14, pokemon: 10, nintendo: 8, brawl: 11 };   // par type d'image (les petites images supportent moins de flou)
 const RESET_HOUR = 8;                                               // le défi du jour change à 8h (Paris)
 const ROLES = { Fighter: "Combattant", Tank: "Tank", Mage: "Mage", Assassin: "Assassin", Marksman: "Tireur", Support: "Support" };
 const NINTENDO_ALL = ["Super Mario","Animal Crossing","The Legend of Zelda","Fire Emblem","Splatoon","Metroid","Kirby",
