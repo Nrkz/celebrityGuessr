@@ -68,14 +68,21 @@ function dayKey(now = new Date()) {
 }
 
 // ---------- Réponses acceptées ----------
+// Orthographe indulgente : on compare aussi "au son" (ph=f, c/q=k, h muet, lettres doublées…)
+// et on tolère quelques fautes selon la longueur. Seul le nom attendu est comparé, donc pas de faux positifs entre personnages.
+const phon = s => compact(s).replace(/ph/g, "f").replace(/h/g, "").replace(/[cq]/g, "k").replace(/y/g, "i")
+  .replace(/z/g, "s").replace(/w/g, "v").replace(/(.)\1+/g, "$1");
+const tolerance = len => (len >= 11 ? 3 : len >= 8 ? 2 : len >= 4 ? 1 : 0);
+function close(x, n, px, pn) { const t = tolerance(n.length); return lev(x, n) <= t || lev(px, pn) <= t; }
 function matchOne(input, name) {
   const x = compact(input), n = compact(name);
   if (!x || !n) return false;
   if (x === n) return true;
-  if (n.length >= 6 && lev(x, n) <= Math.floor(n.length / 6)) return true;     // petite faute de frappe
-  const w = norm(name).split(" ");
-  if (w.length > 1 && w[0].length >= 4 && x === w[0]) return true;             // "nunu", "renata"
-  return false;
+  const px = phon(input), pn = phon(name);
+  if (px === pn || close(x, n, px, pn)) return true;
+  // un seul mot du nom suffit : "nunu", "renata", "willump"
+  const words = norm(name).split(" ");
+  return words.length > 1 && words.some(w => w.length >= 4 && close(x, compact(w), px, phon(w)));
 }
 const isMatch = (input, e) => [e.name, ...(e.alt || [])].some(n => matchOne(input, n));
 
@@ -143,10 +150,11 @@ async function submitScore(pseudo, gameId, day, score, correct) {
 // ---------- Navigation ----------
 const VIEWS = ["home", "lobby", "game", "end", "board"];
 function show(v) { VIEWS.forEach(x => $(x).classList.toggle("hide", x !== v)); }
-const pseudo = () => $("pseudo").value.trim();
-const pseudoOk = () => pseudo().length >= 2 && pseudo().length <= 20;
-$("pseudo").value = store.get("blurrio-pseudo", "");
-$("pseudo").addEventListener("input", () => store.set("blurrio-pseudo", pseudo()));
+// Le pseudo est demandé à la fin d'un défi du jour, puis retenu sur l'appareil.
+const pseudo = () => store.get("blurrio-pseudo", "").trim();
+const validPseudo = s => s.length >= 2 && s.length <= 20;
+const pseudoOk = () => validPseudo(pseudo());
+const dailyKey = (g, d) => `blurrio-daily:${g}:${d}`;   // verrou par appareil : valeur "started" puis le score
 
 function renderHome() {
   const box = $("homeGames"); box.innerHTML = "";
@@ -189,24 +197,25 @@ async function openLobby(id) {
   $("playDaily").disabled = false; $("playFree").disabled = false;
   await refreshDailyStatus();
 }
-// Vérifie (si un pseudo est saisi) que le défi du jour n'a pas déjà été joué. Ne bloque jamais sans pseudo.
+// Le défi du jour est verrouillé sur cet appareil dès qu'il est lancé (la première partie compte seule).
 async function refreshDailyStatus() {
   $("lobbyMsg").textContent = ""; $("lobbyMsg").className = "msg";
   $("playDaily").disabled = false;
+  const v = store.get(dailyKey(S.gameId, dayKey()));
+  if (v !== null) {
+    $("lobbyMsg").textContent = v === "started" ? `Défi du jour déjà lancé sur cet appareil. Reviens demain à ${RESET_HOUR}h !`
+      : `Défi du jour déjà joué : ${v} pts. Reviens demain à ${RESET_HOUR}h !`;
+    $("lobbyMsg").className = "msg ok"; $("playDaily").disabled = true; return;
+  }
   if (!pseudoOk()) return;
   try {
     const row = await alreadyPlayed(pseudo(), S.gameId, dayKey());
     if (row) { $("lobbyMsg").textContent = `Défi du jour déjà joué : ${row.score} pts. Reviens demain à ${RESET_HOUR}h !`; $("lobbyMsg").className = "msg ok"; $("playDaily").disabled = true; }
   } catch { $("lobbyMsg").textContent = "Classement indisponible pour l'instant (réseau). Tu peux jouer en partie libre."; $("lobbyMsg").className = "msg bad"; }
 }
-$("pseudo").addEventListener("change", refreshDailyStatus);
 $("lobbyBack").onclick = () => show("home");
 $("lobbyBoard").onclick = () => openBoard(S.gameId);
 $("playDaily").onclick = async () => {
-  if (!pseudoOk()) {                       // le pseudo se demande ici, au moment de lancer le défi
-    $("lobbyMsg").textContent = "Saisis ton pseudo (2 à 20 caractères) pour jouer le défi du jour."; $("lobbyMsg").className = "msg bad";
-    $("pseudo").focus(); return;
-  }
   await refreshDailyStatus();
   if (!$("playDaily").disabled) startGame("daily");
 };
@@ -230,6 +239,7 @@ async function startGame(mode) {
   $("playFree").disabled = false;
   if (!S.rounds.length) { $("lobbyMsg").textContent = "Pas assez de personnages pour jouer."; return; }
   Object.assign(S, { idx: -1, score: 0, streak: 0, correct: 0, results: [], phase: "idle" });
+  if (mode === "daily") store.set(dailyKey(S.gameId, S.day), "started");     // verrou : une seule tentative par jour
   $("modeTag").textContent = (mode === "daily" ? "📅 Défi " + S.day : "🎲 Libre") + " · " + game(S.gameId).label;
   show("game"); nextRound();
 }
@@ -303,15 +313,23 @@ async function finish() {
   $("recap").innerHTML = S.results.map(r => `<li><span>${r.ok ? "✅" : "❌"} ${r.name}</span><b>${r.pts ? "+" + r.pts : "0"}</b></li>`).join("");
   $("submitMsg").textContent = ""; $("submitMsg").className = "msg";
   if (S.mode === "free") { $("submitMsg").textContent = "Partie libre : ce score ne compte pas au classement. Joue le Défi du jour !"; }
-  if (S.mode === "daily") {
-    $("submitMsg").textContent = "Envoi de ton score…";
-    try {
-      const res = await submitScore(pseudo(), S.gameId, S.day, S.score, S.correct);
-      $("submitMsg").textContent = res === "ok" ? "✅ Score enregistré au classement du jour !" : "Tu avais déjà joué ce défi : ce score ne compte pas.";
-      $("submitMsg").className = "msg " + (res === "ok" ? "ok" : "bad");
-    } catch { $("submitMsg").textContent = "❌ Score non envoyé (réseau). Il n'a pas été enregistré."; $("submitMsg").className = "msg bad"; }
+  $("submitBox").classList.add("hide");
+  if (S.mode === "daily") {                  // le pseudo se demande ici, après le quiz
+    store.set(dailyKey(S.gameId, S.day), String(S.score));
+    $("pseudoEnd").value = pseudo(); $("submitBtn").disabled = false; $("submitBox").classList.remove("hide");
   }
 }
+$("submitForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const p = $("pseudoEnd").value.trim();
+  if (!validPseudo(p)) { $("submitMsg").textContent = "Le pseudo doit faire 2 à 20 caractères."; $("submitMsg").className = "msg bad"; return; }
+  $("submitBtn").disabled = true; $("submitMsg").textContent = "Envoi de ton score…"; $("submitMsg").className = "msg";
+  try {
+    const res = await submitScore(p, S.gameId, S.day, S.score, S.correct);
+    if (res === "ok") { store.set("blurrio-pseudo", p); $("submitBox").classList.add("hide"); $("submitMsg").textContent = "✅ Score enregistré au classement du jour !"; $("submitMsg").className = "msg ok"; }
+    else { $("submitBtn").disabled = false; $("submitMsg").textContent = "Ce pseudo a déjà un score pour ce défi aujourd'hui. Choisis-en un autre."; $("submitMsg").className = "msg bad"; }
+  } catch { $("submitBtn").disabled = false; $("submitMsg").textContent = "❌ Envoi impossible (réseau). Réessaie."; $("submitMsg").className = "msg bad"; }
+});
 $("again").onclick = () => openLobby(S.gameId);
 $("endHome").onclick = () => show("home");
 $("endBoard").onclick = () => openBoard(S.gameId);

@@ -8,7 +8,9 @@ League of Legends · Pokémon (au choix par génération) · Super Mario · Anim
 ## Compétition
 - **Défi du jour** : les mêmes 10 personnages pour tout le monde, par jeu. Il change à **8h (heure de Paris)**. Seule la **première partie du jour** compte.
 - **Classements** par jeu : aujourd'hui · ce mois-ci · tous les temps (meilleur score de chaque joueur).
-- Pseudo libre, sans compte. Pokémon : le défi du jour utilise la génération 1 seulement.
+- Pseudo libre, sans compte : il se saisit **à la fin du défi**, au moment d'enregistrer le score. Le défi est verrouillé par appareil dès qu'il est lancé ; la base refuse un 2ᵉ score pour le même pseudo, jeu et jour.
+- Orthographe indulgente : accents, apostrophes, fautes et variantes de prononciation sont acceptés (« cho gate » pour Cho'Gath).
+- Pokémon : le défi du jour utilise la génération 1 seulement.
 - Bouton **Partager mon score** avec un lien qui rouvre le même jeu.
 
 ## Fonctionnement

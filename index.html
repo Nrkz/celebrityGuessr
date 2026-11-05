@@ -21,9 +21,7 @@
   <!-- Salle d'un jeu -->
   <section id="lobby" class="card center hide">
     <h2 id="lobbyTitle" style="margin-top:0"></h2>
-    <p class="pts" id="lobbyInfo"></p>
-    <input type="text" id="pseudo" maxlength="20" placeholder="Ton pseudo (pour le défi du jour)" style="width:100%;max-width:320px;text-align:center">
-    <div id="gensBox" class="hide">
+    <p class="pts" id="lobbyInfo"></p>    <div id="gensBox" class="hide">
       <p class="pts">Générations pour la partie libre :</p>
       <div class="gens" id="gens"></div>
       <p class="pts"><small>Le défi du jour utilise la génération 1 seulement.</small></p>
@@ -70,6 +68,13 @@
     <p id="endMode" class="pts"></p>
     <div class="big" id="final">0</div>
     <p class="pts" id="record"></p>
+    <div id="submitBox" class="hide">
+      <p class="pts">Entre ton pseudo pour enregistrer ton score au classement :</p>
+      <form class="guess" id="submitForm" autocomplete="off">
+        <input type="text" id="pseudoEnd" maxlength="20" placeholder="Ton pseudo (2 à 20 caractères)">
+        <button type="submit" id="submitBtn">Enregistrer</button>
+      </form>
+    </div>
     <p class="msg" id="submitMsg"></p>
     <ul class="rec" id="recap"></ul>
     <div class="row">
