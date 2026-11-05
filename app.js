@@ -6,13 +6,16 @@ const SB_URL = "https://qqmqiaspmxijjnmkarew.supabase.co/rest/v1/scores";
 const SB_KEY = "sb_publishable_PB596PGqbPs7aROwWmoP8g_3B_lFqKE";   // clé publique, faite pour être visible
 const DD = "https://ddragon.leagueoflegends.com";
 const ROUNDS = 10, STEP_MS = 450, STEPS = 40;                       // ~18 s pour tout dévoiler
-const MAX_BLUR = { lol: 14, pokemon: 10, nintendo: 8 };
+const MAX_BLUR = { lol: 14, pokemon: 10, nintendo: 8, brawl: 5 };   // par type d'image (les petites images supportent moins de flou)
 const RESET_HOUR = 8;                                               // le défi du jour change à 8h (Paris)
 const ROLES = { Fighter: "Combattant", Tank: "Tank", Mage: "Mage", Assassin: "Assassin", Marksman: "Tireur", Support: "Support" };
 const NINTENDO_ALL = ["Super Mario","Animal Crossing","The Legend of Zelda","Fire Emblem","Splatoon","Metroid","Kirby",
   "Kid Icarus","Star Fox","Pikmin","Donkey Kong","Classic Nintendo","F-Zero","Earthbound","Xenoblade","ARMS","Punch Out",
   "Yoshi's Woolly World","Mario Sports Superstars"];
-const SERIES_LABEL = { "The Legend of Zelda": "Zelda", "Classic Nintendo": "Nintendo classique" };
+const SERIES_LABEL = { "The Legend of Zelda": "Zelda", "Classic Nintendo": "Nintendo classique", "Pokemon": "Pokémon", "Megaman": "Mega Man",
+  "Pac-man": "Pac-Man", "Banjo Kazooie": "Banjo-Kazooie", "Earthbound": "EarthBound", "Punch Out": "Punch-Out!!", "Kid Icarus": "Kid Icarus" };
+const CLASS_FR = { "Damage Dealer": "Dégâts", "Tank": "Tank", "Marksman": "Tireur", "Artillery": "Artillerie", "Controller": "Contrôle", "Assassin": "Assassin", "Support": "Soutien" };
+const VARIANTS = new Set(["Ratha V", "Razewing Ratha"]);        // variantes écartées (trop proches d'un autre nom)
 
 const GAMES = [
   { id: "lol",            label: "League of Legends", group: "Riot Games", sub: "173 champions" },
@@ -22,8 +25,11 @@ const GAMES = [
   { id: "zelda",          label: "Zelda",             group: "Nintendo",   series: ["The Legend of Zelda"] },
   { id: "fireemblem",     label: "Fire Emblem",       group: "Nintendo",   series: ["Fire Emblem"] },
   { id: "splatoon",       label: "Splatoon",          group: "Nintendo",   series: ["Splatoon"] },
+  { id: "smash",          label: "Super Smash Bros",  group: "Nintendo",   sub: "83 combattants, tous univers" },
   { id: "nintendo",       label: "Nintendo mélange",  group: "Nintendo",   series: NINTENDO_ALL, sub: "toutes les séries" },
-  { id: "melange",        label: "Mélange",           group: "Tous les jeux", sub: "LoL + Pokémon + Nintendo" },
+  { id: "monsterhunter",  label: "Monster Hunter",    group: "Capcom",     sub: "monstres et compagnons" },
+  { id: "brawl",          label: "Brawl Stars",       group: "Supercell",  sub: "tous les brawlers" },
+  { id: "melange",        label: "Mélange total",     group: "Tous les jeux", sub: "tous les jeux ci-dessus" },
 ];
 const game = id => GAMES.find(g => g.id === id);
 
@@ -109,11 +115,34 @@ const nintendoPool = series => NINTENDO.filter(c => series.includes(c.series)).m
   key: "nt:" + c.series + ":" + c.name, game: "nintendo", name: c.name, alt: [], tag: SERIES_LABEL[c.series] || c.series, tl: "Série", imgs: c.images,
 }));
 
+const lab = s => SERIES_LABEL[s] || s;
+const smashPool = () => SMASH.map(c => ({ key: "sm:" + c.name, game: "nintendo", name: c.name, alt: [], tag: lab(c.series), tl: "Univers", imgs: c.images }));
+const extraPool = series => EXTRA.filter(c => series.includes(c.series) && !VARIANTS.has(c.name))
+  .map(c => ({ key: "ex:" + c.series + ":" + c.name, game: "nintendo", name: c.name, alt: [], tag: lab(c.series), tl: "Série", imgs: c.images }));
+
+// Brawl Stars : liste des brawlers en direct (Brawlify), icône sans bordure.
+let BRAWL = null;
+async function loadBrawl() {
+  if (BRAWL) return BRAWL;
+  const d = await (await fetch("https://api.brawlapi.com/v1/brawlers")).json();
+  BRAWL = d.list.filter(b => b.released !== false && b.imageUrl2).sort((a, b) => a.id - b.id).map(b => ({
+    key: "bs:" + b.id, game: "brawl", name: b.name, alt: [], tag: CLASS_FR[b.class?.name] || b.class?.name || "Brawler", tl: "Classe", imgs: [b.imageUrl2],
+  }));
+  return BRAWL;
+}
+
 async function subPools(gameId, gens) {
   const g = game(gameId);
   if (gameId === "lol") return [await loadLol()];
   if (gameId === "pokemon") return [pokemonPool(gens)];
-  if (gameId === "melange") return [await loadLol(), pokemonPool([1]), nintendoPool(NINTENDO_ALL)];
+  if (gameId === "smash") return [smashPool()];
+  if (gameId === "monsterhunter") return [extraPool(["Monster Hunter"])];
+  if (gameId === "brawl") return [await loadBrawl()];
+  if (gameId === "melange") {                       // un jeu en panne ne bloque pas le mélange
+    const pools = [await loadLol(), pokemonPool([1]), nintendoPool(NINTENDO_ALL), smashPool(), extraPool(["Monster Hunter"])];
+    try { pools.push(await loadBrawl()); } catch {}
+    return pools;
+  }
   return [nintendoPool(g.series)];
 }
 

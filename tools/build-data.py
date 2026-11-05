@@ -53,7 +53,28 @@ def amiibo():
     for c in res: per[c["series"]] = per.get(c["series"], 0) + 1
     print("nintendo:", len(res), "personnages", dict(sorted(per.items(), key=lambda kv: -kv[1])))
 
+    # Super Smash Bros : un combattant par nom (le « Mii » générique est écarté), série = franchise d'origine.
+    smash = {}
+    for x in d:
+        if x["amiiboSeries"] != "Super Smash Bros." or x["character"] == "Mii": continue
+        c = smash.setdefault(x["character"], {"name": x["character"], "series": x["gameSeries"], "images": []})
+        if x["image"] not in c["images"]: c["images"].append(x["image"])
+    smash = sorted(smash.values(), key=lambda c: c["name"])
+    # Autres univers (Monster Hunter…) : tout ce qui n'est ni Nintendo ni Pokémon ni Mii/Wii Fit.
+    skip = NINTENDO | {"Pokemon", "Mii", "Wii Fit"}
+    extra = {}
+    for x in d:
+        if x["gameSeries"] in skip: continue
+        c = extra.setdefault((x["gameSeries"], x["character"]), {"name": x["character"], "series": x["gameSeries"], "images": []})
+        if x["image"] not in c["images"]: c["images"].append(x["image"])
+    extra = sorted(extra.values(), key=lambda c: (c["series"], c["name"]))
+    with open(os.path.join(OUT, "jv.js"), "w", encoding="utf-8") as f:
+        f.write("// généré par tools/build-data.py\nconst SMASH=" + json.dumps(smash, ensure_ascii=False, separators=(",", ":"))
+                + ";\nconst EXTRA=" + json.dumps(extra, ensure_ascii=False, separators=(",", ":")) + ";\n")
+    print("smash:", len(smash), "| autres univers:", len(extra))
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    amiibo()
-    pokemon()
+    which = sys.argv[1:] or ["amiibo", "pokemon"]      # ex. : python tools/build-data.py amiibo
+    if "amiibo" in which: amiibo()
+    if "pokemon" in which: pokemon()
