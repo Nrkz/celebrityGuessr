@@ -186,17 +186,30 @@ async function openLobby(id) {
       $("gens").appendChild(l);
     }
   }
-  $("playDaily").disabled = true;
-  if (!pseudoOk()) { $("lobbyMsg").textContent = "Saisis un pseudo (2 à 20 caractères) sur l'accueil pour jouer le défi du jour."; return; }
+  $("playDaily").disabled = false; $("playFree").disabled = false;
+  await refreshDailyStatus();
+}
+// Vérifie (si un pseudo est saisi) que le défi du jour n'a pas déjà été joué. Ne bloque jamais sans pseudo.
+async function refreshDailyStatus() {
+  $("lobbyMsg").textContent = ""; $("lobbyMsg").className = "msg";
+  $("playDaily").disabled = false;
+  if (!pseudoOk()) return;
   try {
-    const row = await alreadyPlayed(pseudo(), id, day);
-    if (row) { $("lobbyMsg").textContent = `Défi du jour déjà joué : ${row.score} pts. Reviens demain à ${RESET_HOUR}h !`; $("lobbyMsg").className = "msg ok"; }
-    else $("playDaily").disabled = false;
+    const row = await alreadyPlayed(pseudo(), S.gameId, dayKey());
+    if (row) { $("lobbyMsg").textContent = `Défi du jour déjà joué : ${row.score} pts. Reviens demain à ${RESET_HOUR}h !`; $("lobbyMsg").className = "msg ok"; $("playDaily").disabled = true; }
   } catch { $("lobbyMsg").textContent = "Classement indisponible pour l'instant (réseau). Tu peux jouer en partie libre."; $("lobbyMsg").className = "msg bad"; }
 }
+$("pseudo").addEventListener("change", refreshDailyStatus);
 $("lobbyBack").onclick = () => show("home");
 $("lobbyBoard").onclick = () => openBoard(S.gameId);
-$("playDaily").onclick = () => startGame("daily");
+$("playDaily").onclick = async () => {
+  if (!pseudoOk()) {                       // le pseudo se demande ici, au moment de lancer le défi
+    $("lobbyMsg").textContent = "Saisis ton pseudo (2 à 20 caractères) pour jouer le défi du jour."; $("lobbyMsg").className = "msg bad";
+    $("pseudo").focus(); return;
+  }
+  await refreshDailyStatus();
+  if (!$("playDaily").disabled) startGame("daily");
+};
 $("playFree").onclick = () => startGame("free");
 
 // ---------- Partie ----------
@@ -213,7 +226,7 @@ async function startGame(mode) {
     const rng = mode === "daily" ? seeded(S.day + "|" + S.gameId) : Math.random;
     const pools = await subPools(S.gameId, mode === "daily" ? [1] : selectedGens());
     S.rounds = buildRounds(pools, rng);
-  } catch { $("lobbyMsg").textContent = "Impossible de charger les données (réseau ?)."; $("lobbyMsg").className = "msg bad"; $("playFree").disabled = false; return; }
+  } catch { $("lobbyMsg").textContent = "Impossible de charger les données (réseau ?)."; $("lobbyMsg").className = "msg bad"; $("playFree").disabled = false; $("playDaily").disabled = false; return; }
   $("playFree").disabled = false;
   if (!S.rounds.length) { $("lobbyMsg").textContent = "Pas assez de personnages pour jouer."; return; }
   Object.assign(S, { idx: -1, score: 0, streak: 0, correct: 0, results: [], phase: "idle" });
@@ -289,6 +302,7 @@ async function finish() {
   if (S.score > best) store.set(bk, S.score);
   $("recap").innerHTML = S.results.map(r => `<li><span>${r.ok ? "✅" : "❌"} ${r.name}</span><b>${r.pts ? "+" + r.pts : "0"}</b></li>`).join("");
   $("submitMsg").textContent = ""; $("submitMsg").className = "msg";
+  if (S.mode === "free") { $("submitMsg").textContent = "Partie libre : ce score ne compte pas au classement. Joue le Défi du jour !"; }
   if (S.mode === "daily") {
     $("submitMsg").textContent = "Envoi de ton score…";
     try {
